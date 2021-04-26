@@ -189,28 +189,28 @@ class MiningBot
 		{
 			this.y = nextTile.y * 30;
 			this.x = Math.max(nextTile.x * 30, this.x - this.speed * delta);
-			this.rotateTo(Math.PI * 0.5);
+			this.rotateTo(Math.PI * 1.5);
 		}
 
 		if (currentTile.x < nextTile.x)
 		{
 			this.y = nextTile.y * 30;
 			this.x = Math.min(nextTile.x * 30, this.x + this.speed * delta);
-			this.rotateTo(Math.PI * 1.5);
+			this.rotateTo(Math.PI * 0.5);
 		}
 
 		if (currentTile.y > nextTile.y)
 		{
 			this.x = nextTile.x * 30;
 			this.y = Math.max(nextTile.y * 30, this.y - this.speed * delta);
-			this.rotateTo(Math.PI);
+			this.rotateTo(0);
 		}
 
 		if (currentTile.y < nextTile.y)
 		{
 			this.x = nextTile.x * 30;
 			this.y = Math.min(nextTile.y * 30, this.y + this.speed * delta);
-			this.rotateTo(0);
+			this.rotateTo(Math.PI);
 		}
 
 		if (this.x === nextTile.x * 30 && this.y === nextTile.y * 30)
@@ -219,10 +219,29 @@ class MiningBot
 
 	rotateTo(rotation)
 	{
-		if (Math.PI * 2 - this.rotation + rotation < Math.abs(this.rotation - rotation))
-			this.rotation -= 0.1;
+		let tempr = this.rotation, r1 = tempr, n1 = 0, n2 = 0;
+		let r = ((rotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+		while (Math.abs(r - r1) > Math.PI / 32)
+		{
+			tempr += Math.PI / 64;
+			r1 = ((tempr % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			n1++;
+		}
+		tempr = this.rotation, r1 = tempr;
+		while (Math.abs(r - r1) > Math.PI / 32)
+		{
+			tempr -= Math.PI / 64;
+			r1 = ((tempr % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			n2++;
+		}
+		if (n1 <= n2)
+		{
+			this.rotation += Math.PI / 32;
+		}
 		else
-			this.rotation += 0.1;
+		{
+			this.rotation -= Math.PI / 32;
+		}
 	}
 
 	render(game)

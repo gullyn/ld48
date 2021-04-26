@@ -29,6 +29,7 @@ class Game
 		this.itemSelected = null;
 		this.blackTimeout = 0;
 		this.blackCircle = true;
+		this.gameOver = false;
 
 		this.placeTimer = 0;
 
@@ -41,7 +42,11 @@ class Game
 			background: this.loadImage("assets/background.png"),
 			mining: this.loadImage("assets/mining.png"),
 			turret: this.loadImage("assets/turret.png"),
-			turret2: this.loadImage("assets/turret2.png")
+			turret2: this.loadImage("assets/turret2.png"),
+			turret3: this.loadImage("assets/turret3.png"),
+			enemy1: this.loadImage("assets/enemy1.png"),
+			enemy2: this.loadImage("assets/enemy2.png"),
+			player: this.loadImage("assets/player.png")
 		};
 		
 		this.assets.wall.onload = function()
@@ -92,8 +97,27 @@ class Game
 		}
 	}
 
+	gameOverRender()
+	{
+		this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+		this.ctx.fillStyle = "black";
+		this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+		this.ctx.fillStyle = "white";
+		this.ctx.font = "75px Courier New";
+		this.ctx.textAlign = "center";
+		this.ctx.fillText("Game Over", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+		this.ctx.font = "25px Courier New";
+		this.ctx.fillText("Press space to restart", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 100);
+	}
+
 	update()
 	{
+		if (this.gameOver)
+		{
+			this.gameOverRender();
+			window.requestAnimationFrame(this.update.bind(this));
+			return;
+		}
 		let delta = (new Date().getTime() - this.lastFrameTime) / (1000 / this.targetFPS);
 		this.lastFrameTime = new Date().getTime();
 		this.frameTimes.push(this.lastFrameTime);
@@ -338,6 +362,85 @@ class Game
 						this.messageTime = 120;
 					}
 				}
+				else if (this.itemSelected === 5 && this.placeTimer <= 0)
+				{
+					if (this.inventory.radium >= 5)
+					{
+						let xPos = Math.floor(x / 30) * 30;
+						let yPos = Math.floor(y / 30) * 30;
+						let canPlace = true;
+						for (let block of this.world.blocks)
+						{
+							let trueX = block.x - Math.floor(block.width / 2) * 30;
+							let trueY = block.y - Math.floor(block.height / 2) * 30;
+
+							if (xPos >= trueX && yPos >= trueY &&
+								xPos < trueX + block.width * 30 && yPos < trueY + block.height * 30)
+							{
+								canPlace = false;
+							}
+						}
+						if (canPlace && x > 0 && y > 0 &&
+							x < this.world.sectors.length * 300 &&
+							y < this.world.sectors.length * 300 && this.getBlock(x, y))
+						{
+							this.world.placeBlock(xPos, yPos, 1, 1, 5, 800);
+							this.audio.place.play();
+							this.inventory.radium -= 5;
+							this.placeTimer = 10;
+						}
+						else
+						{
+							this.message = "You cannot place that block there";
+							this.messageTime = 120;
+						}
+					}
+					else
+					{
+						this.message = "You do not have enough resources";
+						this.messageTime = 120;
+					}
+				}
+				else if (this.itemSelected === 6 && this.placeTimer <= 0)
+				{
+					if (this.inventory.radium >= 15 && this.inventory.firite >= 15)
+					{
+						let xPos = Math.floor(x / 30) * 30;
+						let yPos = Math.floor(y / 30) * 30;
+						let canPlace = true;
+						for (let block of this.world.blocks)
+						{
+							let trueX = block.x - Math.floor(block.width / 2) * 30;
+							let trueY = block.y - Math.floor(block.height / 2) * 30;
+
+							if (xPos >= trueX && yPos >= trueY &&
+								xPos < trueX + block.width * 30 && yPos < trueY + block.height * 30)
+							{
+								canPlace = false;
+							}
+						}
+						if (canPlace && x > 0 && y > 0 &&
+							x < this.world.sectors.length * 300 &&
+							y < this.world.sectors.length * 300 && this.getBlock(x, y))
+						{
+							this.world.placeBlock(xPos, yPos, 1, 1, 6, 200);
+							this.audio.place.play();
+							this.inventory.radium -= 15;
+							this.inventory.firite -= 15;
+							this.placeTimer = 10;
+						}
+						else
+						{
+							this.message = "You cannot place that block there";
+							this.messageTime = 120;
+						}
+					}
+					else
+					{
+						this.message = "You do not have enough resources";
+						this.messageTime = 120;
+					}
+				}
 				else if (this.itemSelected === null && Math.abs(adjX) + Math.abs(adjY) <= 200)
 				{
 					if (sector.blocks[blockX][blockY] === 2)
@@ -484,7 +587,7 @@ class Game
 			//}
 			this.ctx.fillStyle = "black";
 			this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height / 2 - 420);
-			this.ctx.fillRect(0, 0, this.ctx.canvas.width / 2 - 440, this.ctx.canvas.height);
+			this.ctx.fillRect(0, 0, this.ctx.canvas.width / 2 - 439, this.ctx.canvas.height);
 			this.ctx.fillRect(this.ctx.canvas.width / 2 + 450, 0, this.ctx.canvas.width / 2 - 430, this.ctx.canvas.height);
 			this.ctx.fillRect(0, this.ctx.canvas.height / 2 + 460, this.ctx.canvas.width, this.ctx.canvas.height / 2 - 440);
 		}
@@ -605,6 +708,22 @@ class Game
 				);
 			}
 		}
+		else if (this.itemSelected === 5 || this.itemSelected === 6)
+		{
+			let x = this.mousePos.x - this.ctx.canvas.width / 2 + this.player.x;
+			let y = this.mousePos.y - this.ctx.canvas.height / 2 + this.player.y;
+
+			if (x > 0 && y > 0 && x < this.world.sectors.length * 300 && y < this.world.sectors.length * 300)
+			{
+				this.ctx.fillStyle = "rgba(9, 159, 9, 0.6)";
+				this.ctx.fillRect(
+					this.renderingPosX(Math.floor(x / 30) * 30),
+					this.renderingPosY(Math.floor(y / 30) * 30),
+					30,
+					30
+				);
+			}
+		}
 		let hoveringMiningBot = false;
 
 		if (this.mousePos.x >= this.ctx.canvas.width - 340 && this.mousePos.x <= this.ctx.canvas.width - 190 &&
@@ -687,6 +806,16 @@ class Game
 		this.ctx.strokeStyle = this.itemSelected === 4 ? "red" : "black";
 		this.ctx.strokeRect(this.ctx.canvas.width - 140, this.ctx.canvas.height - 205, 40, 40);
 		this.ctx.drawImage(this.assets.turret2, this.ctx.canvas.width - 135, this.ctx.canvas.height - 200, 30, 30);
+
+		this.ctx.strokeStyle = this.itemSelected === 5 ? "red" : "black";
+		this.ctx.strokeRect(this.ctx.canvas.width - 90, this.ctx.canvas.height - 205, 40, 40);
+		this.ctx.fillStyle = "rgb(9, 159, 9)";
+		this.ctx.fillRect(this.ctx.canvas.width - 85, this.ctx.canvas.height - 200, 30, 30);
+
+		this.ctx.strokeStyle = this.itemSelected === 6 ? "red" : "black";
+		this.ctx.lineWidth = 4;
+		this.ctx.strokeRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - 155, 40, 40);
+		this.ctx.drawImage(this.assets.turret3, this.ctx.canvas.width - 335, this.ctx.canvas.height - 150, 30, 30);
 
 		this.ctx.fillStyle = "rgb(100, 100, 100)";
 		this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - 55, 150, 40);
@@ -811,6 +940,41 @@ class Game
 
 				this.ctx.fillStyle = "rgb(255, 255, 0)";
 				this.ctx.fillRect(this.ctx.canvas.width - 143, this.ctx.canvas.height - 332, 15, 15);
+			}
+			else if (this.itemSelected === 5)
+			{
+				this.ctx.fillText(
+					"Radium Wall    5",
+					this.ctx.canvas.width - 340,
+					this.ctx.canvas.height - 320
+				);
+
+				this.ctx.fillText(
+					"Upgraded firite wall",
+					this.ctx.canvas.width - 340,
+					this.ctx.canvas.height - 290
+				);
+				this.ctx.fillStyle = "rgb(9, 159, 9)";
+				this.ctx.fillRect(this.ctx.canvas.width - 225, this.ctx.canvas.height - 332, 15, 15);
+			}
+			else if (this.itemSelected === 6)
+			{
+				this.ctx.fillText(
+					"Radium Gun     15    15",
+					this.ctx.canvas.width - 340,
+					this.ctx.canvas.height - 320
+				);
+
+				this.ctx.fillText(
+					"Shoots even faster",
+					this.ctx.canvas.width - 340,
+					this.ctx.canvas.height - 290
+				);
+				this.ctx.fillStyle = "rgb(9, 159, 9)";
+				this.ctx.fillRect(this.ctx.canvas.width - 225, this.ctx.canvas.height - 332, 15, 15);
+
+				this.ctx.fillStyle = "rgb(255, 30, 0)";
+				this.ctx.fillRect(this.ctx.canvas.width - 173, this.ctx.canvas.height - 332, 15, 15);
 			}
 		}
 		else if (hoveringMiningBot)
@@ -1052,6 +1216,38 @@ class Game
 						this.ctx.canvas.height - (318 - baseY) + 35
 					);
 				}
+				else if (block === -6)
+				{
+					this.ctx.fillStyle = "rgb(9, 159, 9)";
+					this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - (330 - baseY), 15, 15);
+					this.ctx.fillStyle = "black";
+					this.ctx.fillText(
+						"Radium Wall (" + blockData.health + " health)",
+						this.ctx.canvas.width - 320,
+						this.ctx.canvas.height - (318 - baseY)
+					);
+					this.ctx.fillText(
+						"Upgraded firite wall",
+						this.ctx.canvas.width - 340,
+						this.ctx.canvas.height - (318 - baseY) + 35
+					);
+				}
+				else if (block === -7)
+				{
+					this.ctx.fillStyle = "rgb(9, 159, 9)";
+					this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - (330 - baseY), 15, 15);
+					this.ctx.fillStyle = "black";
+					this.ctx.fillText(
+						"Radium Gun (" + blockData.health + " health)",
+						this.ctx.canvas.width - 320,
+						this.ctx.canvas.height - (318 - baseY)
+					);
+					this.ctx.fillText(
+						"Shoots even faster",
+						this.ctx.canvas.width - 340,
+						this.ctx.canvas.height - (318 - baseY) + 35
+					);
+				}
 			}
 		}
 	
@@ -1279,16 +1475,26 @@ class Game
 		if (typeof direction === "undefined")
 			return;
 
+		this.player.rotateTo(direction - Math.PI * 1.5);
+
 		let newX = this.player.x + Math.cos(direction) * 5 * delta;
 		let newY = this.player.y + Math.sin(direction) * 5 * delta;
 
-		if (this.getBlock(newX - 15, newY) !== 0 &&
-			this.getBlock(newX + 15, newY) !== 0)
+		if (this.getBlock(newX - 20, this.player.y - 20) !== 0 &&
+			this.getBlock(newX + 20, this.player.y - 20) !== 0 &&
+			this.getBlock(newX - 20, this.player.y + 20) !== 0 &&
+			this.getBlock(newX + 20, this.player.y + 20) !== 0)
+		{
 			this.player.x = newX;
+		}
 
-		if (this.getBlock(newX, newY - 15) !== 0 &&
-			this.getBlock(newX, newY + 15) !== 0)
+		if (this.getBlock(this.player.x - 20, newY - 20) !== 0 &&
+			this.getBlock(this.player.x + 20, newY - 20) !== 0 &&
+			this.getBlock(this.player.x - 20, newY + 20) !== 0 &&
+			this.getBlock(this.player.x + 20, newY + 20) !== 0)
+		{
 			this.player.y = newY;
+		}
 	}
 
 	pathfindingPath(current)
@@ -1444,6 +1650,11 @@ class Game
 
 	keydown(event)
 	{
+		if (this.gameOver && event.key === " ")
+		{
+			location.reload();
+			return;
+		}
 		if (event.key === " ")
 			this.paused = !this.paused;
 		else if (event.key.toLowerCase() === "x")
@@ -1524,6 +1735,18 @@ class Game
 				event.clientX <= this.ctx.canvas.width - 100 &&
 				event.clientY <= this.ctx.canvas.height - 165)
 				this.itemSelected = this.itemSelected === 4 ? null : 4;
+
+			if (event.clientX >= this.ctx.canvas.width - 90 &&
+				event.clientY >= this.ctx.canvas.height - 205 &&
+				event.clientX <= this.ctx.canvas.width - 50 &&
+				event.clientY <= this.ctx.canvas.height - 165)
+				this.itemSelected = this.itemSelected === 5 ? null : 5;
+
+			if (event.clientX >= this.ctx.canvas.width - 340 &&
+				event.clientY >= this.ctx.canvas.height - 155 &&
+				event.clientX <= this.ctx.canvas.width - 300 &&
+				event.clientY <= this.ctx.canvas.height - 115)
+				this.itemSelected = this.itemSelected === 6 ? null : 6;
 
 			return;
 		}

@@ -61,6 +61,9 @@ class World
 			case 4:
 				color = "rgb(100, 30, 0)";
 				break;
+			case 5:
+				color = "rgb(9, 159, 9)";
+				break;
 			default:
 				color = "rgb(60, 60, 60)";
 				break;

@@ -24,7 +24,7 @@ class EnemyManager
 		if (this.time <= 0)
 		{
 			this.level++;
-			this.time = 8000;
+			this.time = 90 * 60;
 			for (let base of this.bases)
 			{
 				let totalValue = Math.round(Math.pow(Math.log2(this.level), 3)) + 1;

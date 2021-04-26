@@ -28,7 +28,7 @@ class Block
 			}
 		}
 
-		if (this.type === 1 || this.type === 4)
+		if (this.type === 1 || this.type === 4 || this.type === 6)
 		{
 			let closest = 15 * 30, closestEnemy = null;
 			for (let enemy of game.enemies.enemies)
@@ -45,7 +45,7 @@ class Block
 			if (this.reloadTime <= 0 && this.target !== null)
 			{
 				this.shoot();
-				this.reloadTime = this.type === 1 ? 60 : 10;
+				this.reloadTime = this.type === 1 ? 60 : (this.type === 4 ? 20 : 10);
 			}
 		}
 	}
@@ -113,6 +113,39 @@ class Block
 			game.ctx.fillRect(-20, -4, 22, 8);
 			game.ctx.restore();
 		}
+		else if (this.type === 6)
+		{
+			game.ctx.beginPath();
+			game.ctx.fillStyle = "rgb(9, 159, 9)";
+			game.ctx.arc(
+				game.renderingPosX(this.x - Math.floor(this.width / 2) * 30) + 15,
+				game.renderingPosY(this.y - Math.floor(this.height / 2) * 30) + 15,
+				15,
+				0,
+				Math.PI * 2
+			);
+			game.ctx.fill();
+			game.ctx.beginPath();
+			game.ctx.fillStyle = "#353535";
+			game.ctx.arc(
+				game.renderingPosX(this.x - Math.floor(this.width / 2) * 30) + 15,
+				game.renderingPosY(this.y - Math.floor(this.height / 2) * 30) + 15,
+				12,
+				0,
+				Math.PI * 2
+			);
+			game.ctx.fill();
+			let rotation = this.target === null ? Math.PI * 1.5 : Math.atan2(this.target.y - this.y, this.target.x - this.x);
+			game.ctx.save();
+			game.ctx.translate(
+				game.renderingPosX(this.x - Math.floor(this.width / 2) * 30) + 15,
+				game.renderingPosY(this.y - Math.floor(this.height / 2) * 30) + 15
+			);
+			game.ctx.rotate(rotation - Math.PI);
+			game.ctx.fillStyle = "red";
+			game.ctx.fillRect(-20, -4, 22, 8);
+			game.ctx.restore();
+		}
 		else
 		{
 			game.ctx.fillStyle = this.color;
@@ -133,7 +166,7 @@ class Block
 	shoot()
 	{
 		let rotation = Math.atan2(this.target.y - this.y, this.target.x - this.x);
-		let spread = this.type === 4 ? Math.PI / 12 : 0;
+		let spread = this.type === 4 ? Math.PI / 12 : (this.type === 6 ? Math.PI / 8 : 0);
 		let addSpread = Math.random() * spread - spread / 2;
 		this.bullets.push(new Bullet(this.x + 15, this.y + 15, rotation + addSpread));
 	}

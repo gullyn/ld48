@@ -7,6 +7,7 @@ class Player
 		this.miningTimeout = 0;
 		this.bullets = [];
 		this.reloadTime = 0;
+		this.rotation = 0;
 	}
 
 	update(game, delta)
@@ -23,10 +24,14 @@ class Player
 
 	render(game)
 	{
-		game.ctx.fillStyle = "black";
-		game.ctx.beginPath();
-		game.ctx.arc(game.renderingPosX(this.x), game.renderingPosY(this.y), 15, 0, Math.PI * 2);
-		game.ctx.fill();
+		game.ctx.save();
+		game.ctx.translate(
+			game.renderingPosX(this.x),
+			game.renderingPosY(this.y)
+		);
+		game.ctx.rotate(this.rotation);
+		game.ctx.drawImage(game.assets.player, -20, -20, 40, 40);
+		game.ctx.restore();
 
 		for (let bullet of this.bullets)
 		{
@@ -50,5 +55,32 @@ class Player
 			game.audio.shoot2.play();
 		else
 			game.audio.shoot3.play();
+	}
+
+	rotateTo(rotation)
+	{
+		let tempr = this.rotation, r1 = tempr, n1 = 0, n2 = 0;
+		let r = ((rotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+		while (Math.abs(r - r1) > Math.PI / 32)
+		{
+			tempr += Math.PI / 64;
+			r1 = ((tempr % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			n1++;
+		}
+		tempr = this.rotation, r1 = tempr;
+		while (Math.abs(r - r1) > Math.PI / 32)
+		{
+			tempr -= Math.PI / 64;
+			r1 = ((tempr % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			n2++;
+		}
+		if (n1 <= n2)
+		{
+			this.rotation += Math.PI / 32;
+		}
+		else
+		{
+			this.rotation -= Math.PI / 32;
+		}
 	}
 }

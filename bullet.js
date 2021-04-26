@@ -34,6 +34,8 @@ class Bullet
 					this.x <= trueX + block.width * 30 && this.y <= trueY + block.width * 30)
 				{
 					block.takeDamage(this.damage);
+					if (block.health <= 0 && block.type === 0)
+						game.gameOver = true;
 					return true;
 				}
 			}

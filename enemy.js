@@ -1,6 +1,6 @@
 class Enemy
 {
-	constructor(x, y, path, speed, reloadTime, health)
+	constructor(x, y, path, speed, reloadTime, health, texture)
 	{
 		this.x = x;
 		this.y = y;
@@ -12,6 +12,8 @@ class Enemy
 		this.health = health;
 		this.stopped = false;
 		this.targetBlock = null;
+		this.texture = texture;
+		this.rotation = 0;
 	}
 
 	update(game, delta)
@@ -55,28 +57,28 @@ class Enemy
 			{
 				this.y = nextTile.y * 30;
 				this.x = Math.max(nextTile.x * 30, this.x - this.speed * delta);
-				this.rotateTo(Math.PI * 0.5);
+				this.rotateTo(Math.PI * 1.5);
 			}
 
 			if (currentTile.x < nextTile.x)
 			{
 				this.y = nextTile.y * 30;
 				this.x = Math.min(nextTile.x * 30, this.x + this.speed * delta);
-				this.rotateTo(Math.PI * 1.5);
+				this.rotateTo(Math.PI * 0.5);
 			}
 
 			if (currentTile.y > nextTile.y)
 			{
 				this.x = nextTile.x * 30;
 				this.y = Math.max(nextTile.y * 30, this.y - this.speed * delta);
-				this.rotateTo(Math.PI);
+				this.rotateTo(0);
 			}
 
 			if (currentTile.y < nextTile.y)
 			{
 				this.x = nextTile.x * 30;
 				this.y = Math.min(nextTile.y * 30, this.y + this.speed * delta);
-				this.rotateTo(0);
+				this.rotateTo(Math.PI);
 			}
 
 			if (this.x === nextTile.x * 30 && this.y === nextTile.y * 30)
@@ -128,7 +130,29 @@ class Enemy
 
 	rotateTo(rotation)
 	{
-
+		let tempr = this.rotation, r1 = tempr, n1 = 0, n2 = 0;
+		let r = ((rotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+		while (Math.abs(r - r1) > Math.PI / 32)
+		{
+			tempr += Math.PI / 64;
+			r1 = ((tempr % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			n1++;
+		}
+		tempr = this.rotation, r1 = tempr;
+		while (Math.abs(r - r1) > Math.PI / 32)
+		{
+			tempr -= Math.PI / 64;
+			r1 = ((tempr % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			n2++;
+		}
+		if (n1 <= n2)
+		{
+			this.rotation += Math.PI / 32;
+		}
+		else
+		{
+			this.rotation -= Math.PI / 32;
+		}
 	}
 
 	render(game)
@@ -137,13 +161,14 @@ class Enemy
 		{
 			bullet.render(game);
 		}
-		game.ctx.fillStyle = "red";
-		game.ctx.fillRect(
-			game.renderingPosX(this.x) + 5,
-			game.renderingPosY(this.y) + 5,
-			20,
-			20
+		game.ctx.save();
+		game.ctx.translate(
+			game.renderingPosX(this.x) + 15,
+			game.renderingPosY(this.y) + 15
 		);
+		game.ctx.rotate(this.rotation);
+		game.ctx.drawImage(this.texture === 0 ? game.assets.enemy1 : game.assets.enemy2, -20, -20, 40, 40);
+		game.ctx.restore();
 	}
 
 	takeDamage(damage)
@@ -156,7 +181,7 @@ class BasicEnemy extends Enemy
 {
 	constructor(x, y, path)
 	{
-		super(x, y, path, 3, 60, 50);
+		super(x, y, path, 3 + Math.random() * 0.5, 60, 50, 0);
 	}
 }
 
@@ -164,6 +189,6 @@ class StrongEnemy extends Enemy
 {
 	constructor(x, y, path)
 	{
-		super(x, y, path, 4, 30, 100);
+		super(x, y, path, 4 + Math.random() * 0.5, 30, 100, 1);
 	}
 }
