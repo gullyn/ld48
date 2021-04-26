@@ -14,9 +14,21 @@ window.onload = function()
 	{
 		if (game)
 			return;
+
 		if (event.clientX >= canvas.width / 2 - 100 && event.clientY >= canvas.height / 2 - 50 &&
 			event.clientX <= canvas.width / 2 + 100 && event.clientY <= canvas.height / 2 + 50)
-			startGame();
+		{
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.font = "30px Courier New";
+			ctx.fillText("Creating pathfinding graph...", canvas.width / 2, canvas.height / 2);
+			ctx.textAlign = "left";
+
+			window.setTimeout(startGame, 30);
+		}
 	});
 }
 
@@ -40,6 +52,8 @@ function renderMainScreen()
 	ctx.fillStyle = "white";
 	ctx.fillRect(canvas.width / 2 - 100, canvas.height / 2 - 50, 200, 100);
 	ctx.textAlign = "center";
+	ctx.font = "50px Courier New";
+	ctx.fillText("The Deep Caverns", canvas.width / 2, canvas.height / 4);
 	ctx.fillStyle = "black";
 	ctx.font = "20px Courier New";
 	ctx.fillText("Start game", canvas.width / 2, canvas.height / 2);
