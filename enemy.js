@@ -1,15 +1,15 @@
 class Enemy
 {
-	constructor(x, y, path)
+	constructor(x, y, path, speed, reloadTime, health)
 	{
 		this.x = x;
 		this.y = y;
 		this.path = path;
 		this.pathItem = 0;
-		this.speed = 3;
+		this.speed = speed;
 		this.bullets = [];
-		this.reloadTime = 60;
-		this.health = 50;
+		this.reloadTime = reloadTime;
+		this.health = health;
 		this.stopped = false;
 		this.targetBlock = null;
 	}
@@ -149,5 +149,21 @@ class Enemy
 	takeDamage(damage)
 	{
 		this.health -= damage;
+	}
+}
+
+class BasicEnemy extends Enemy
+{
+	constructor(x, y, path)
+	{
+		super(x, y, path, 3, 60, 50);
+	}
+}
+
+class StrongEnemy extends Enemy
+{
+	constructor(x, y, path)
+	{
+		super(x, y, path, 4, 30, 100);
 	}
 }

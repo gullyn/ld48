@@ -24,10 +24,29 @@ class EnemyManager
 		if (this.time <= 0)
 		{
 			this.level++;
-			this.time = 10000;
+			this.time = 8000;
 			for (let base of this.bases)
 			{
-				this.enemies.push(new Enemy(base.x * 30, base.y * 30, base.path));
+				let totalValue = Math.round(Math.pow(Math.log2(this.level), 3)) + 1;
+				while (totalValue > 0)
+				{
+					let rand = Math.floor(Math.random() * 2);
+					switch (rand)
+					{
+						case 0:
+							this.enemies.push(new BasicEnemy(base.x * 30, base.y * 30, base.path));
+							totalValue -= 1;
+							break;
+						case 1:
+							if (totalValue < 5)
+								break;
+							this.enemies.push(new StrongEnemy(base.x * 30, base.y * 30, base.path));
+							totalValue -= 5;
+							break;
+						default:
+							break;
+					}
+				}
 			}
 		}
 	}

@@ -59,8 +59,37 @@ class Game
 			shoot2: this.loadAudio("sfx/shoot2.wav"),
 			shoot3: this.loadAudio("sfx/shoot3.wav"),
 			respawn: this.loadAudio("sfx/respawn.wav"),
-			place: this.loadAudio("sfx/place.wav")
+			place: this.loadAudio("sfx/place.wav"),
+			music1: this.loadAudio("sfx/music1.mp3"),
+			music2: this.loadAudio("sfx/music2.mp3"),
+			music3: this.loadAudio("sfx/music3.mp3")
 		};
+
+		this.audio.music1.play();
+		this.currentMusic = 1;
+		this.audio.music1.onended = this.switchMusic.bind(this);
+		this.audio.music2.onended = this.switchMusic.bind(this);
+		this.audio.music3.onended = this.switchMusic.bind(this);
+	}
+
+	switchMusic()
+	{
+		this.currentMusic++;
+		if (this.currentMusic > 3)
+			this.currentMusic = 1;
+
+		switch (this.currentMusic)
+		{
+			case 1:
+				this.audio.music1.play();
+				break;
+			case 2:
+				this.audio.music2.play();
+				break;
+			case 3:
+				this.audio.music3.play();
+				break;
+		}
 	}
 
 	update()
@@ -1041,6 +1070,8 @@ class Game
 		}
 		else
 		{
+			this.ctx.font = "25px Courier New";
+			this.ctx.fillText(this.getEnemyTime(), this.ctx.canvas.width / 2, 40);
 			this.ctx.font = "40px Courier New";
 			this.ctx.fillText("Level " + this.enemies.level, this.ctx.canvas.width / 2, 90);
 		}
@@ -1415,6 +1446,19 @@ class Game
 	{
 		if (event.key === " ")
 			this.paused = !this.paused;
+		else if (event.key.toLowerCase() === "x")
+		{
+			let x = Math.floor((this.mousePos.x - this.ctx.canvas.width / 2 + this.player.x) / 30) * 30;
+			let y = Math.floor((this.mousePos.y - this.ctx.canvas.height / 2 + this.player.y) / 30) * 30;
+
+			for (let i = this.world.blocks.length - 1; i > -1; i--)
+			{
+				if (this.world.blocks[i].x === x && this.world.blocks[i].y === y)
+				{
+					this.world.blocks.splice(i, 1);
+				}
+			}
+		}
 		this.keys[event.key.toLowerCase()] = true;
 	}
 
