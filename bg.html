@@ -1,0 +1,19 @@
+<html>
+	<body>
+		<canvas width=900 height=900></canvas>
+		<script>
+			let canvas = document.querySelector("canvas");
+			let ctx = canvas.getContext("2d");
+
+			for (let x = -22; x < 23; x++)
+			{
+				for (let y = -22; y < 23; y++)
+				{
+					let d = Math.sqrt(x * x + y * y);
+					ctx.fillStyle = `rgba(0, 0, 0, ${d / 15 - 0.6})`;
+					ctx.fillRect(canvas.width / 2 + x * 20, canvas.height / 2 + y * 20, 20, 20);
+				}
+			}
+		</script>
+	</body>
+</html>
