@@ -27,7 +27,7 @@ class EnemyManager
 			this.time = 90 * 60;
 			for (let base of this.bases)
 			{
-				let totalValue = Math.floor(Math.pow(this.level, 1.2)) + 1;
+				let totalValue = Math.floor(Math.pow(this.level, 1.2));
 				while (totalValue > 0)
 				{
 					let rand = Math.floor(Math.random() * 4);
