@@ -44,17 +44,17 @@ class Sector
 					}
 					else if (ore2Noise > 0.6)
 					{
-						blockData["count"] = Math.floor(Math.random() * 25) + 20;
+						blockData["count"] = Math.floor(Math.random() * 20) + 15;
 						blockType = 3;
 					}
 					else if (ore3Noise > 0.6)
 					{
-						blockData["count"] = Math.floor(Math.random() * 25) + 10;
+						blockData["count"] = Math.floor(Math.random() * 10) + 10;
 						blockType = 4;
 					}
 					else if (ore4Noise > 0.6)
 					{
-						blockData["count"] = Math.floor(Math.random() * 10) + 5;
+						blockData["count"] = Math.floor(Math.random() * 5) + 5;
 						blockType = 5;
 					}
 				}

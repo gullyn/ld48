@@ -625,7 +625,8 @@ class Game
 								sector.blocks[bx][by] = 1;
 								continue;
 							}
-							sector.blockData[bx][by]["count"] *= Math.max(0.2, Math.min(1, (dist - 8) / 10));
+							sector.blockData[bx][by]["count"] *= Math.max(0.2, Math.min(1, (dist - 8) / 15));
+							sector.blockData[bx][by]["count"] = Math.max(1, sector.blockData[bx][by]["count"]);
 						}
 						else if (sector.blocks[bx][by] === 5)
 						{
@@ -635,6 +636,7 @@ class Game
 								continue;
 							}
 							sector.blockData[bx][by]["count"] *= Math.max(0.2, Math.min(1, (dist - 20) / 10));
+							sector.blockData[bx][by]["count"] = Math.max(1, sector.blockData[bx][by]["count"]);
 						}
 					}
 				}
