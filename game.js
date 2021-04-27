@@ -46,6 +46,8 @@ class Game
 			turret3: this.loadImage("assets/turret3.png"),
 			enemy1: this.loadImage("assets/enemy1.png"),
 			enemy2: this.loadImage("assets/enemy2.png"),
+			enemy3: this.loadImage("assets/enemy3.png"),
+			enemy4: this.loadImage("assets/enemy4.png"),
 			player: this.loadImage("assets/player.png")
 		};
 		
@@ -107,7 +109,8 @@ class Game
 		this.ctx.textAlign = "center";
 		this.ctx.fillText("Game Over", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
 		this.ctx.font = "25px Courier New";
-		this.ctx.fillText("Press space to restart", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 100);
+		this.ctx.fillText("Press space to restart", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 150);
+		this.ctx.fillText("You made it to level " + this.enemies.level, this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 100);
 	}
 
 	update()
@@ -131,6 +134,14 @@ class Game
 			this.render(this.frameTimes.length / 2);
 			window.requestAnimationFrame(this.update.bind(this));
 			return;
+		}
+
+		if (this.player.health <= 0)
+		{
+			this.player.health = 10;
+			this.player.x = this.spawn.x;
+			this.player.y = this.spawn.y;
+			this.audio.respawn.play();
 		}
 
 		this.world.blocks[0].health = Math.min(1000, this.world.blocks[0].health + delta / 60);
@@ -646,6 +657,7 @@ class Game
 
 	renderUI()
 	{
+		let circle = null;
 		if (this.itemSelected === 1)
 		{
 			let x = this.mousePos.x - this.ctx.canvas.width / 2 + this.player.x;
@@ -821,6 +833,10 @@ class Game
 
 		this.ctx.fillStyle = "rgb(100, 100, 100)";
 		this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - 55, 150, 40);
+
+		this.ctx.fillStyle = "black";
+		this.ctx.font = "15px Courier New";
+		this.ctx.fillText("Health: " + this.player.health + "/10", this.ctx.canvas.width - 340, this.ctx.canvas.height - 75);
 
 		this.ctx.fillStyle = "white";
 		this.ctx.textAlign = "center";
@@ -1156,6 +1172,7 @@ class Game
 				}
 				else if (block === -2)
 				{
+					circle = {x: Math.floor(x / 30) * 30, y: Math.floor(y / 30) * 30};
 					this.ctx.fillStyle = "rgb(60, 60, 60)";
 					this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - (330 - baseY), 15, 15);
 					this.ctx.fillStyle = "black";
@@ -1204,6 +1221,7 @@ class Game
 				}
 				else if (block === -5)
 				{
+					circle = {x: Math.floor(x / 30) * 30, y: Math.floor(y / 30) * 30};
 					this.ctx.fillStyle = "rgb(100, 30, 0)";
 					this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - (330 - baseY), 15, 15);
 					this.ctx.fillStyle = "black";
@@ -1236,6 +1254,7 @@ class Game
 				}
 				else if (block === -7)
 				{
+					circle = {x: Math.floor(x / 30) * 30, y: Math.floor(y / 30) * 30};
 					this.ctx.fillStyle = "rgb(9, 159, 9)";
 					this.ctx.fillRect(this.ctx.canvas.width - 340, this.ctx.canvas.height - (330 - baseY), 15, 15);
 					this.ctx.fillStyle = "black";
@@ -1282,6 +1301,13 @@ class Game
 			this.ctx.fillText("Press space to resume", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 50);
 		}
 		this.ctx.textAlign = "left";
+		if (circle !== null)
+		{
+			this.ctx.beginPath();
+			this.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+			this.ctx.arc(this.renderingPosX(circle.x), this.renderingPosY(circle.y), 15 * 30, 0, Math.PI * 2);
+			this.ctx.fill();
+		}
 	}
 
 	getEnemyTime()
@@ -1707,6 +1733,7 @@ class Game
 				this.player.x = this.spawn.x;
 				this.player.y = this.spawn.y;
 				this.audio.respawn.play();
+				this.player.health = 10;
 			}
 			if (event.clientX >= this.ctx.canvas.width - 340 &&
 				event.clientY >= this.ctx.canvas.height - 205 &&

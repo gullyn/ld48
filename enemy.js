@@ -167,7 +167,7 @@ class Enemy
 			game.renderingPosY(this.y) + 15
 		);
 		game.ctx.rotate(this.rotation);
-		game.ctx.drawImage(this.texture === 0 ? game.assets.enemy1 : game.assets.enemy2, -20, -20, 40, 40);
+		game.ctx.drawImage(this.texture === 0 ? game.assets.enemy1 : (this.texture === 1 ? game.assets.enemy2 : (this.texture === 2 ? game.assets.enemy3 : game.assets.enemy4)), -20, -20, 40, 40);
 		game.ctx.restore();
 	}
 
@@ -190,5 +190,21 @@ class StrongEnemy extends Enemy
 	constructor(x, y, path)
 	{
 		super(x, y, path, 4 + Math.random() * 0.5, 30, 100, 1);
+	}
+}
+
+class FastEnemy extends Enemy
+{
+	constructor(x, y, path)
+	{
+		super(x, y, path, 5 + Math.random() * 0.5, 15, 100, 2);
+	}
+}
+
+class MegaEnemy extends Enemy
+{
+	constructor(x, y, path)
+	{
+		super(x, y, path, 2 + Math.random() * 0.5, 15, 500, 3);
 	}
 }

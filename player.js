@@ -8,6 +8,7 @@ class Player
 		this.bullets = [];
 		this.reloadTime = 0;
 		this.rotation = 0;
+		this.health = 10;
 	}
 
 	update(game, delta)

@@ -25,6 +25,13 @@ class Bullet
 
 		if (this.enemy)
 		{
+			let a = game.player.x - this.x;
+			let b = game.player.y - this.y;
+			if (Math.sqrt(a * a + b * b) < 20)
+			{
+				game.player.health -= 1;
+				return true;
+			}
 			for (let block of game.world.blocks)
 			{
 				let trueX = block.x - Math.floor(block.width / 2) * 30;

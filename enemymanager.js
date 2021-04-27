@@ -30,7 +30,7 @@ class EnemyManager
 				let totalValue = Math.round(Math.pow(Math.log2(this.level), 3)) + 1;
 				while (totalValue > 0)
 				{
-					let rand = Math.floor(Math.random() * 2);
+					let rand = Math.floor(Math.random() * 4);
 					switch (rand)
 					{
 						case 0:
@@ -42,6 +42,18 @@ class EnemyManager
 								break;
 							this.enemies.push(new StrongEnemy(base.x * 30, base.y * 30, base.path));
 							totalValue -= 5;
+							break;
+						case 2:
+							if (totalValue < 10)
+								break;
+							this.enemies.push(new FastEnemy(base.x * 30, base.y * 30, base.path));
+							totalValue -= 10;
+							break;
+						case 3:
+							if (totalValue < 20)
+								break;
+							this.enemies.push(new MegaEnemy(base.x * 30, base.y * 30, base.path));
+							totalValue -= 20;
 							break;
 						default:
 							break;
@@ -58,16 +70,16 @@ class EnemyManager
 			enemy.render(this.game);
 		}
 
-		for (let base of this.bases)
-		{
-			this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
-			this.game.ctx.fillRect(
-				this.game.renderingPosX(base.x * 30),
-				this.game.renderingPosY(base.y * 30),
-				60,
-				60
-			);
-		}
+		//for (let base of this.bases)
+		//{
+		//	this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+		//	this.game.ctx.fillRect(
+		//		this.game.renderingPosX(base.x * 30),
+		//		this.game.renderingPosY(base.y * 30),
+		//		60,
+		//		60
+		//	);
+		//}
 	}
 
 	createBases()
